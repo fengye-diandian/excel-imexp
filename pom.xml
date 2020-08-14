@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.2.10.BUILD-SNAPSHOT</version>
+		<version>2.1.10.RELEASE</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.fengye</groupId>
@@ -127,22 +127,21 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.1</version>
+				<version>3.7.0</version>
 				<configuration>
 					<source>1.8</source>
 					<target>1.8</target>
 					<showWarnings>true</showWarnings>
 				</configuration>
-				<executions>
-					<execution>
-						<!--可以生成不含依赖包的不可执行Jar包 -->
-						<configuration>
-							<classifier>exec</classifier>
-						</configuration>
-					</execution>
-				</executions>
+				<!--<executions>-->
+					<!--<execution>-->
+						<!--&lt;!&ndash;可以生成不含依赖包的不可执行Jar包 &ndash;&gt;-->
+						<!--<configuration>-->
+							<!--<classifier>exec</classifier>-->
+						<!--</configuration>-->
+					<!--</execution>-->
+				<!--</executions>-->
 			</plugin>
-
 		</plugins>
 	</build>
 
@@ -158,36 +157,5 @@
 			<url>http://47.94.238.185:8081/nexus/content/repositories/snapshots</url>
 		</snapshotRepository>
 	</distributionManagement>
-
-	<!--<repositories>-->
-		<!--<repository>-->
-			<!--<id>spring-milestones</id>-->
-			<!--<name>Spring Milestones</name>-->
-			<!--<url>https://repo.spring.io/milestone</url>-->
-		<!--</repository>-->
-		<!--<repository>-->
-			<!--<id>spring-snapshots</id>-->
-			<!--<name>Spring Snapshots</name>-->
-			<!--<url>https://repo.spring.io/snapshot</url>-->
-			<!--<snapshots>-->
-				<!--<enabled>true</enabled>-->
-			<!--</snapshots>-->
-		<!--</repository>-->
-	<!--</repositories>-->
-	<!--<pluginRepositories>-->
-		<!--<pluginRepository>-->
-			<!--<id>spring-milestones</id>-->
-			<!--<name>Spring Milestones</name>-->
-			<!--<url>https://repo.spring.io/milestone</url>-->
-		<!--</pluginRepository>-->
-		<!--<pluginRepository>-->
-			<!--<id>spring-snapshots</id>-->
-			<!--<name>Spring Snapshots</name>-->
-			<!--<url>https://repo.spring.io/snapshot</url>-->
-			<!--<snapshots>-->
-				<!--<enabled>true</enabled>-->
-			<!--</snapshots>-->
-		<!--</pluginRepository>-->
-	<!--</pluginRepositories>-->
 
 </project>
