@@ -438,7 +438,7 @@ public class ImportExcelUtil {
             // 导出数据写入Excel
             HSSFRow dataRow = sheet.createRow(sheet.getLastRowNum() + 1);
             Class clazz = obj.getClass();
-            Field[] fields = clazz.getFields();
+            Field[] fields = clazz.getDeclaredFields();
             for(Field field : fields){
                 // 判断属性是否加了指定注解
                 if (field.isAnnotationPresent(ExcelModelProperty.class)) {
