@@ -8,15 +8,32 @@ import java.io.BufferedInputStream;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Excel导出抽象工具类
- * @param <T>
- */
 
+/**
+ * @Author zhoufeng
+ * @Description Excel导出抽象工具类
+ * @Date 2021/11/22 11:54
+ * @Param
+ * @return
+ **/
 public abstract class AbstractExcelOutput<T> {
-	
+
+	/**
+	 * @Author zhoufeng
+	 * @Description Excel导出执行数据查询抽象函数
+	 * @Date 2021/11/22 15:01
+	 * @Param [object]
+	 * @return com.fengye.excel.imexp.model.OutputHandlerVO<T>
+	 **/
 	public abstract OutputHandlerVO<T> queryOutputData(Object object) throws Throwable;
 
+	/**
+	 * @Author zhoufeng
+	 * @Description 下载模板：模板下拉框数据查询抽象函数
+	 * @Date 2021/11/22 15:02
+	 * @Param [object]
+	 * @return com.fengye.excel.imexp.model.OutputHandlerVO<T>
+	 **/
 	public abstract OutputHandlerVO<T> queryTemplateComboBox(Object object) throws Throwable;
 
     /**

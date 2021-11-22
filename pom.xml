@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.fengye</groupId>
 	<artifactId>excel-imexp</artifactId>
-	<version>1.0.0</version>
+	<version>1.1.0</version>
 	<name>excel-imexp</name>
 	<description>excel Import and export</description>
 
@@ -112,10 +112,6 @@
 
 	<build>
 		<plugins>
-			<!--<plugin>-->
-				<!--<groupId>org.springframework.boot</groupId>-->
-				<!--<artifactId>spring-boot-maven-plugin</artifactId>-->
-			<!--</plugin>-->
 			<!-- mvn clean package 跳过Test -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -124,37 +120,62 @@
 					<skip>true</skip>
 				</configuration>
 			</plugin>
+			<!-- 打包排除目录 -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.7.0</version>
+				<artifactId>maven-jar-plugin</artifactId>
 				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
-					<showWarnings>true</showWarnings>
+					<excludes>
+						<exclude>**/demo/**</exclude>
+						<exclude>*.properties</exclude>
+					</excludes>
 				</configuration>
-				<!--<executions>-->
-					<!--<execution>-->
-						<!--&lt;!&ndash;可以生成不含依赖包的不可执行Jar包 &ndash;&gt;-->
-						<!--<configuration>-->
-							<!--<classifier>exec</classifier>-->
-						<!--</configuration>-->
-					<!--</execution>-->
-				<!--</executions>-->
+			</plugin>
+
+			<!-- 如何把SpringBoot工程打包成不可执行的Jar包 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <executions>
+					<execution>
+						<configuration>
+							<classifier>exec</classifier>
+						</configuration>
+					</execution>
+                </executions>
+            </plugin>
+			<!-- Source attach plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>3.2.1</version>
+				<configuration>
+					<attach>true</attach>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>compile</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
+
 	</build>
 
 	<distributionManagement>
+		<!--正式版本-->
 		<repository>
-			<id>nexus-releases</id>
-			<name>Nexus Release Repository</name>
-			<url>http://47.94.238.185:8081/nexus/content/repositories/releases</url>
+			<!-- nexus服务器中用户名：在settings.xml中<server>的id-->
+			<id>nexus</id>
+			<url>http://192.168.56.101:8081/repository/maven-releases/</url>
 		</repository>
 		<snapshotRepository>
-			<id>nexus-snapshots</id>
-			<name>Nexus Snapshot Repository</name>
-			<url>http://47.94.238.185:8081/nexus/content/repositories/snapshots</url>
+			<!-- nexus服务器中用户名：在settings.xml中<server>的id-->
+			<id>nexus</id>
+			<url>http://192.168.56.101:8081/repository/maven-snapshots/</url>
 		</snapshotRepository>
 	</distributionManagement>
 

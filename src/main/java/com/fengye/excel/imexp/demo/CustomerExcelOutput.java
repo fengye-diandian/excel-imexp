@@ -26,21 +26,26 @@ public class CustomerExcelOutput extends AbstractExcelOutput<CustomerVO> {
 	 */
 	@Override
 	public OutputHandlerVO<CustomerVO> queryOutputData(Object object) {
+		// 写Excel数据的承载对象
 		OutputHandlerVO<CustomerVO> vo = new OutputHandlerVO();
 
-		CustomerVO cvo = new CustomerVO();
-		cvo.setShopName("小米");
-		cvo.setNikeName("小红");
-		cvo.setMobile("1346");
-		cvo.setGoodsName("小米6");
-		cvo.setGoodsCode("mi-6");
-		cvo.setNumber(1);
-		cvo.setRealName("红红");
-		cvo.setPrice(new BigDecimal(12.6));
-		cvo.setTotalPrice(new BigDecimal(12.6));
-		cvo.setCustomeDate(new Date());
+		// 构件测试数据
 		List<CustomerVO> list = new ArrayList<>();
-		list.add(cvo);
+		for(int i =0; i<100000; i++){
+			CustomerVO cvo = new CustomerVO();
+			cvo.setShopName("小米"+i);
+			cvo.setNikeName("小红");
+			cvo.setMobile("1346");
+			cvo.setGoodsName("小米6");
+			cvo.setGoodsCode("mi-6");
+			cvo.setNumber(1);
+			cvo.setRealName("红红");
+			cvo.setPrice(new BigDecimal(12.6));
+			cvo.setTotalPrice(new BigDecimal(12.6));
+			cvo.setCustomeDate(new Date());
+			list.add(cvo);
+		}
+
 		vo.setDataArray(list);
 
 		return vo;
@@ -53,6 +58,8 @@ public class CustomerExcelOutput extends AbstractExcelOutput<CustomerVO> {
 	@Override
 	public OutputHandlerVO<CustomerVO> queryTemplateComboBox(Object object) {
 		OutputHandlerVO<CustomerVO> vo = new OutputHandlerVO();
+
+		// Excel下拉框数据
 		Map<String,String[]> paramMap = new HashMap();
 		//excel第三行为下拉选择框
 		String[] nameArray = {"红米","小米"};

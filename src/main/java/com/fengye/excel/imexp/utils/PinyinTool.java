@@ -7,9 +7,12 @@ import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
 import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
 
 /**
- *
- * 汉字转拼音
- */
+ * @Author zhoufeng
+ * @Description 汉字转拼音
+ * @Date 2021/11/22 13:47
+ * @Param
+ * @return
+ **/
 public class PinyinTool {
     private static HanyuPinyinOutputFormat format = null;
     public static enum Type {
@@ -35,14 +38,13 @@ public class PinyinTool {
     public static String toPinYin(String str,Type type) throws BadHanyuPinyinOutputFormatCombination{
     	return toPinYin(str, "", type);
     }
-    /**
-     * 将str转换成拼音，如果不是汉字或者没有对应的拼音，则不作转换
-     * 如： 明天 转换成 MINGTIAN
-     * @param str
-     * @param spera
-     * @return
-     * @throws BadHanyuPinyinOutputFormatCombination
-     */
+     /**
+      * @Author zhoufeng     *
+      * @Description 将str转换成拼音，如果不是汉字或者没有对应的拼音，则不作转换,如： 明天 转换成 MINGTIAN
+      * @Date 2021/11/22 11:42
+      * @Param [str, spera, type]
+      * @return java.lang.String
+      **/
     public static String toPinYin(String str, String spera, Type type) throws BadHanyuPinyinOutputFormatCombination {
         if(str == null || str.trim().length()==0)
             return "";

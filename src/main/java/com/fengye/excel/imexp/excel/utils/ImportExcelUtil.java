@@ -5,11 +5,9 @@ import cn.hutool.core.date.DateUtil;
 import com.fengye.excel.imexp.annotation.ExcelModelProperty;
 import com.fengye.excel.imexp.annotation.ExcelModelTitle;
 import com.fengye.excel.imexp.datatype.DataTypeEnum;
-import com.fengye.excel.imexp.model.ParesResult;
 import com.fengye.excel.imexp.utils.PinyinTool;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.hssf.model.InternalSheet;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.usermodel.*;
@@ -27,7 +25,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -35,8 +32,12 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * @Author zhoufeng
  * @Description excel导入导出工具类的实现
- */
+ * @Date 2020/8/13 15:20
+ * @Param
+ * @return
+ **/
 //@Service
 public class ImportExcelUtil {
 	private static final Logger _logger = LoggerFactory.getLogger(ImportExcelUtil.class);
@@ -57,7 +58,7 @@ public class ImportExcelUtil {
      * @throws Exception
      */
     @SuppressWarnings({  "resource", "rawtypes" })
-    public static ParesResult<List> importExcel(Class<?> clazz, InputStream xls) throws Throwable {
+    public static List importExcel(Class<?> clazz, InputStream xls) throws Throwable {
         try {
             // 取得Excel
             HSSFWorkbook wb = new HSSFWorkbook(xls);
@@ -100,7 +101,7 @@ public class ImportExcelUtil {
                                 // 判断是否允许为空   false=不可为空；true=可为空
                                 if (excelModelProperty.required()) {
                                     // 禁止为空项为空，异常
-                                    return ParesResult.error("9999",String.format(notnullerror, (1 + i), excelModelProperty.name(), excelModelProperty.name()));
+                                    throw new Exception(String.format(notnullerror, (1 + i), excelModelProperty.name(), excelModelProperty.name()));
                                 }
                             } else if (field.getType().equals(Date.class)) {
                                 if (CellType.STRING.equals(cell.getCellType())) {
@@ -159,7 +160,7 @@ public class ImportExcelUtil {
                 }
                 modelList.add(model);
             }
-            return ParesResult.success(modelList);
+            return modelList;
         } finally {
             xls.close();
         }

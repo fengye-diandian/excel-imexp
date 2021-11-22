@@ -9,7 +9,7 @@ import com.fengye.excel.imexp.demo.CustomerExcelParse;
 import com.fengye.excel.imexp.demo.model.CustomerVO;
 import com.fengye.excel.imexp.excel.AbstractExcelOutput;
 import com.fengye.excel.imexp.excel.AbstractExcelParse;
-import com.fengye.excel.imexp.model.ParesResult;
+import com.fengye.excel.imexp.demo.ParesResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
@@ -32,7 +32,8 @@ public class ImportEmployeeController {
     public ParesResult uploadExcel(@RequestParam("file") MultipartFile file) throws Throwable {
         try{
         	AbstractExcelParse<CustomerVO> base = SpringUtil.getBean(CustomerExcelParse.class);
-        	return base.excelParesHandel(CustomerVO.class, file);
+        	base.excelParesHandel(CustomerVO.class, file);
+            return ParesResult.success();
         }catch(Exception e){
             logger.error("导入失败",e);
             return ParesResult.error("9999","导入异常");
@@ -77,6 +78,7 @@ public class ImportEmployeeController {
     @GetMapping(path = "/exportDataExcel")
     public String outPutExcel(HttpServletResponse response) throws Throwable {
         try{
+            long start = System.currentTimeMillis();
             // 获取文件名称
             ExcelModelTitle excelModelTitle = CustomerVO.class.getAnnotation(ExcelModelTitle.class);
             String fileName =  excelModelTitle.fileName()+DateUtil.today();
@@ -95,6 +97,9 @@ public class ImportEmployeeController {
             os.flush();
             os.close();
             input.close();
+            long end = System.currentTimeMillis();
+
+            System.out.println(">>>>>>>>导出文件耗时："+(end - start));
             return "下载成功！";
         }catch(Exception e){
             logger.error("downloadEmployeeModel() catch Exception ",e);
