@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.fengye</groupId>
 	<artifactId>excel-imexp</artifactId>
-	<version>1.1.0</version>
+	<version>1.2.1</version>
 	<name>excel-imexp</name>
 	<description>excel Import and export</description>
 
@@ -170,12 +170,12 @@
 		<repository>
 			<!-- nexus服务器中用户名：在settings.xml中<server>的id-->
 			<id>nexus</id>
-			<url>http://192.168.56.101:8081/repository/maven-releases/</url>
+			<url>http://nexus.tibiot.cn:8081/repository/maven-releases/</url>
 		</repository>
 		<snapshotRepository>
 			<!-- nexus服务器中用户名：在settings.xml中<server>的id-->
 			<id>nexus</id>
-			<url>http://192.168.56.101:8081/repository/maven-snapshots/</url>
+			<url>http://nexus.tibiot.cn:8081/repository/maven-snapshots/</url>
 		</snapshotRepository>
 	</distributionManagement>
 

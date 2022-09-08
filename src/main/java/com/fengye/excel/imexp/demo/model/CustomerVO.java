@@ -6,11 +6,13 @@ import com.fengye.excel.imexp.annotation.ExcelModelProperty;
 import com.fengye.excel.imexp.annotation.ExcelModelTitle;
 import com.fengye.excel.imexp.datatype.DataTypeEnum;
 import com.fengye.excel.imexp.model.ImportModel;
+import lombok.Data;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
+@Data
 @ExcelModelTitle(name="客户消费数据", fileName="客户消费数据")
 public class CustomerVO extends ImportModel implements Serializable {
 
@@ -48,94 +50,7 @@ public class CustomerVO extends ImportModel implements Serializable {
 	@ExcelModelProperty(name = "消费日期", colIndex = 9, dataType = DataTypeEnum.DATE)
 	public Date customeDate; // 年月日    yyyy-MM-dd
 
-	public Long getId() {
-		return id;
-	}
 
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public String getNikeName() {
-		return nikeName;
-	}
-
-	public void setNikeName(String nikeName) {
-		this.nikeName = nikeName;
-	}
-
-	public String getRealName() {
-		return realName;
-	}
-
-	public void setRealName(String realName) {
-		this.realName = realName;
-	}
-
-	public String getMobile() {
-		return mobile;
-	}
-
-	public void setMobile(String mobile) {
-		this.mobile = mobile;
-	}
-
-	public String getGoodsCode() {
-		return goodsCode;
-	}
-
-	public void setGoodsCode(String goodsCode) {
-		this.goodsCode = goodsCode;
-	}
-
-	public String getGoodsName() {
-		return goodsName;
-	}
-
-	public void setGoodsName(String goodsName) {
-		this.goodsName = goodsName;
-	}
-
-	public Integer getNumber() {
-		return number;
-	}
-
-	public void setNumber(Integer number) {
-		this.number = number;
-	}
-
-	public BigDecimal getPrice() {
-		return price;
-	}
-
-	public void setPrice(BigDecimal price) {
-		this.price = price;
-	}
-
-	public BigDecimal getTotalPrice() {
-		return getPrice().multiply( new BigDecimal(getNumber()));
-	}
-
-	public void setTotalPrice(BigDecimal totalPrice) {
-		this.totalPrice = totalPrice;
-	}
-
-	
-	public String getShopName() {
-		return shopName;
-	}
-
-	public void setShopName(String shopName) {
-		this.shopName = shopName;
-	}
-
-	public Date getCustomeDate() {
-		return customeDate;
-	}
-
-	public void setCustomeDate(Date customeDate) {
-		this.customeDate = customeDate;
-	}
 
 	@Override
 	public String toString() {

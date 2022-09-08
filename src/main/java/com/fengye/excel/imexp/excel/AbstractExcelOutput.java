@@ -57,7 +57,9 @@ public abstract class AbstractExcelOutput<T> {
 	public BufferedInputStream outPutExcel(Class<T> clazz, Object object) throws Throwable {
 		OutputHandlerVO<T> vo = queryOutputData(object);
 		List<T> datas = vo.getDataArray();
-		BufferedInputStream input = new BufferedInputStream(ImportExcelUtil.exportDataExcel(clazz ,  datas));
+		OutputHandlerVO<T> voBox = queryTemplateComboBox(object);
+		Map<String, String[]> paramMap = voBox.getSelectMap();
+		BufferedInputStream input = new BufferedInputStream(ImportExcelUtil.exportDataExcel(clazz, datas, paramMap));
 		return input;
 	}
 

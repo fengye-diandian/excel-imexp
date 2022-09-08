@@ -177,8 +177,8 @@ public class ImportExcelUtil {
         return excelModelbyClass(clazz, map, null, true);
     }
 
-    public static InputStream exportDataExcel(Class<?> clazz, List<?> datas){
-        return excelModelbyClass(clazz, null, datas, false);
+    public static InputStream exportDataExcel(Class<?> clazz, List<?> datas, Map<String, String[]> map){
+        return excelModelbyClass(clazz, map, datas, false);
     }
 
 
