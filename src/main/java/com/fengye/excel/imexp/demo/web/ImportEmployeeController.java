@@ -50,8 +50,8 @@ public class ImportEmployeeController {
         	// 获取文件名称
         	ExcelModelTitle excelModelTitle = clazz.getAnnotation(ExcelModelTitle.class);
         	String fileName =  excelModelTitle.fileName()+ DateUtil.today();
-            response.setContentType("application/xls");
-            response.addHeader("Content-Disposition", "attachment;filename="+new String((fileName).getBytes("UTF-8"),"iso-8859-1")+".xls");
+            response.setContentType("application/xlsx");
+            response.addHeader("Content-Disposition", "attachment;filename=" + new String((fileName).getBytes("UTF-8"),"iso-8859-1")+".xlsx");
             
             AbstractExcelOutput<CustomerVO> output =  SpringUtil.getBean(CustomerExcelOutput.class);
             BufferedInputStream input = output.outPutTemplate(CustomerVO.class, null);
@@ -82,8 +82,8 @@ public class ImportEmployeeController {
             // 获取文件名称
             ExcelModelTitle excelModelTitle = CustomerVO.class.getAnnotation(ExcelModelTitle.class);
             String fileName =  excelModelTitle.fileName()+DateUtil.today();
-            response.setContentType("application/xls");
-            response.addHeader("Content-Disposition", "attachment;filename="+new String((fileName).getBytes("UTF-8"),"iso-8859-1")+".xls");
+            response.setContentType("application/xlsx");
+            response.addHeader("Content-Disposition", "attachment;filename="+new String((fileName).getBytes("UTF-8"),"iso-8859-1")+".xlsx");
 
             AbstractExcelOutput<CustomerVO> output =  SpringUtil.getBean(CustomerExcelOutput.class);
             BufferedInputStream input = output.outPutExcel(CustomerVO.class, null);

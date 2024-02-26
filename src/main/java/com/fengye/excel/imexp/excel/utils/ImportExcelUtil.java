@@ -13,6 +13,7 @@ import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellRangeAddressList;
+import org.apache.poi.xssf.usermodel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,8 +62,8 @@ public class ImportExcelUtil {
     public static List importExcel(Class<?> clazz, InputStream xls) throws Throwable {
         try {
             // 取得Excel
-            HSSFWorkbook wb = new HSSFWorkbook(xls);
-            HSSFSheet sheet = wb.getSheetAt(0);
+            Workbook wb = new XSSFWorkbook(xls);
+            Sheet sheet = wb.getSheetAt(0);
             Field[] fields = clazz.getDeclaredFields();
             List<Field> fieldList = new ArrayList(fields.length);
             for (Field field : fields) {
@@ -84,7 +85,7 @@ public class ImportExcelUtil {
                 // 数据模型
                 Object model = (Object) clazz.newInstance();
                 // 获取行
-                HSSFRow row = sheet.getRow(i);
+                Row row = sheet.getRow(i);
                 // 判断行是否为空
                 if(null == row){
                 	_logger.info("行为空");
@@ -95,10 +96,10 @@ public class ImportExcelUtil {
                         // 获取属性注解
                         ExcelModelProperty excelModelProperty = field.getAnnotation(ExcelModelProperty.class);
                         // 根据属性下标获取对应cell
-                        HSSFCell cell = row.getCell(excelModelProperty.colIndex());
+                        Cell cell = row.createCell(excelModelProperty.colIndex());
                         try {
                             if (cell == null || StringUtils.isEmpty(cell.toString().trim())) {
-                                // 判断是否允许为空   false=不可为空；true=可为空
+                                // 判断是否允许为空   false=可为空；true=不可为空
                                 if (excelModelProperty.required()) {
                                     // 禁止为空项为空，异常
                                     throw new Exception(String.format(notnullerror, (1 + i), excelModelProperty.name(), excelModelProperty.name()));
@@ -145,7 +146,7 @@ public class ImportExcelUtil {
                                     String cellVal = parseString(cell);
                                     // 判断是否下拉框值
                                     if(excelModelProperty.selectbox()){
-                                        cellVal = PinyinTool.fetchZiMu(cellVal);
+//                                        cellVal = PinyinTool.fetchZiMu(cellVal);
                                         if(StringUtils.isEmpty(cellVal)){
                                             cellVal = parseString(cell);
                                         }
@@ -195,14 +196,14 @@ public class ImportExcelUtil {
             if (!clazz.isAnnotationPresent(ExcelModelTitle.class)) {
                 throw new Exception("请在此类型中加上ModelTitle注解");
             }
-            HSSFWorkbook wb = new HSSFWorkbook();
-            HSSFSheet sheet = wb.createSheet();
+            Workbook wb = new XSSFWorkbook();
+            Sheet sheet = wb.createSheet();
             // 设置标题样式
             setExcelTitle(wb, sheet, clazz);
 
             // 获取属性
             Field[] fields = clazz.getDeclaredFields();
-            HSSFRow headRow = sheet.createRow(1);
+            Row headRow = sheet.createRow(1);
             // 记录sheet有多少列
             int colSzie = 0;
 
@@ -218,11 +219,11 @@ public class ImportExcelUtil {
                         continue;
                     cells.add(excelModelProperty);
                     // 创建一个单元格
-                    HSSFCell cell = headRow.createCell(excelModelProperty.colIndex());
+                    Cell cell = headRow.createCell(excelModelProperty.colIndex());
                     // 设置单元格内容
-                    cell.setCellValue(new HSSFRichTextString(excelModelProperty.name()));
+                    cell.setCellValue(new XSSFRichTextString(excelModelProperty.name()));
                     // 设置表头样式
-                    HSSFCellStyle headStyle = setHeadStyle(wb);
+                    CellStyle headStyle = setHeadStyle(wb);
                     // 是否不可为空字段
                     if(excelModelProperty.required() == true){
                         headStyle.setFillForegroundColor(IndexedColors.YELLOW.getIndex());// 设置背景色
@@ -231,7 +232,7 @@ public class ImportExcelUtil {
                     // 设置单元格样式
                     cell.setCellStyle(headStyle);
                     // 设置单元格注释
-                    HSSFComment hssfComment = setComment(sheet, excelModelProperty);
+                    Comment hssfComment = setComment(sheet, excelModelProperty);
                     if(null != hssfComment){
                         cell.setCellComment(hssfComment);
                     }
@@ -277,19 +278,19 @@ public class ImportExcelUtil {
      * @param sheet
      * @param clazz
      */
-    private static void setExcelTitle(HSSFWorkbook wb, HSSFSheet sheet, Class<?> clazz){
-        HSSFCellStyle titleStyle = wb.createCellStyle();
+    private static void setExcelTitle(Workbook wb, Sheet sheet, Class<?> clazz){
+        CellStyle titleStyle = wb.createCellStyle();
         titleStyle.setAlignment(HorizontalAlignment.CENTER_SELECTION);
-        HSSFFont font = wb.createFont();
+        Font font = wb.createFont();
         font.setBold(true);
         font.setFontHeight((short) 400);
         titleStyle.setFont(font);
-        HSSFCell titleCell = sheet.createRow(0).createCell(0); // 创建第一行，并在该行创建单元格，设置内容，做为标题行
+        Cell titleCell = sheet.createRow(0).createCell(0); // 创建第一行，并在该行创建单元格，设置内容，做为标题行
         /**
          * 获取标题
          */
         ExcelModelTitle excelModelTitle = clazz.getAnnotation(ExcelModelTitle.class);
-        titleCell.setCellValue(new HSSFRichTextString(excelModelTitle.name()));
+        titleCell.setCellValue(new XSSFRichTextString(excelModelTitle.name()));
         titleCell.setCellStyle(titleStyle);
     }
 
@@ -298,10 +299,10 @@ public class ImportExcelUtil {
      * @param wb
      * @return
      */
-    private static HSSFCellStyle  setHeadStyle(HSSFWorkbook wb){
-        HSSFCellStyle headStyle = wb.createCellStyle();
+    private static CellStyle  setHeadStyle(Workbook wb){
+        CellStyle headStyle = wb.createCellStyle();
         headStyle.setAlignment(HorizontalAlignment.CENTER_SELECTION);
-        HSSFFont headFont = wb.createFont();
+        Font headFont = wb.createFont();
         headFont.setBold(true);
         headFont.setFontHeight((short) 240);
         headStyle.setFont(headFont);
@@ -317,37 +318,29 @@ public class ImportExcelUtil {
      * @param map
      * @param field
      */
-    private static void setExcelSelectbox(HSSFWorkbook workbook, HSSFSheet sheet, ExcelModelProperty excelModelProperty, Map<String, String[]> map, Field field, boolean dowTemplate){
+    private static void setExcelSelectbox(Workbook workbook, Sheet sheet, ExcelModelProperty excelModelProperty, Map<String, String[]> map, Field field, boolean dowTemplate){
 
         if(dowTemplate){
             // 设置列为下拉框格式   Map的key就是需要设定下拉框单元格的名称
             if (excelModelProperty.selectbox() && map != null && map.get(field.getName()) != null) {
                 // 下拉框数据
                 String[] box = map.get(field.getName());
-                DVConstraint constraint = null;
-                if(box.length >= MAX_SELECT_BOX){
-                    String hiddenSheetName = "hidden"+field.getName();
-                    // 下拉框数据放到另一个隐藏sheet里
-                    selectBoxHiddenValue(workbook, box, field, hiddenSheetName);
-                    // 创建名称，可被其他单元格引用
-                    Name namedCell = workbook.createName();
-                    namedCell.setNameName(hiddenSheetName);
-                    // 设置名称引用的公式
-                    namedCell.setRefersToFormula(hiddenSheetName+"!$A$1:$A$" + box.length);
-                    // 获取下拉框选项
-                    constraint = DVConstraint.createFormulaListConstraint(hiddenSheetName);
-                }else{
-                    constraint = DVConstraint.createExplicitListConstraint(box);
+                StringBuilder arg = new StringBuilder();
+                for (String s : box) {
+                    arg.append(s);
                 }
 
+                XSSFDataValidationHelper helper = new XSSFDataValidationHelper((XSSFSheet) sheet);
+                XSSFDataValidationConstraint constraint = (XSSFDataValidationConstraint)helper.createExplicitListConstraint(box);
+                //参数顺序：开始行、结束行、开始列、结束列
                 // 设定下拉框区域
                 CellRangeAddressList regions = new CellRangeAddressList(2/*从第几行开始*/, SpreadsheetVersion.EXCEL2007.getLastRowIndex()/*第几行结束*/,
                         excelModelProperty.colIndex()/*从第几列开始*/,
                         excelModelProperty.colIndex()/*到第几列结束*/);
-                // 创建下拉框
-                HSSFDataValidation dataValidation = new HSSFDataValidation(regions, constraint);
-                // 将下拉框添加到sheet中
-                sheet.addValidationData(dataValidation);
+                XSSFDataValidation validation = (XSSFDataValidation)helper.createValidation(constraint, regions);
+                validation.setSuppressDropDownArrow(true);
+                validation.setShowErrorBox(true);
+                sheet.addValidationData(validation);
             }
         }
     }
@@ -358,8 +351,8 @@ public class ImportExcelUtil {
      * @param values
      * @param field
      */
-    private static void selectBoxHiddenValue(HSSFWorkbook workbook, String[] values, Field field, String hiddenSheetName){
-        HSSFSheet hidden = workbook.createSheet(hiddenSheetName);
+    private static void selectBoxHiddenValue(Workbook workbook, String[] values, Field field, String hiddenSheetName){
+        Sheet hidden = workbook.createSheet(hiddenSheetName);
         //创建单元格对象
         Cell cell = null;
         for(int i=0; i < values.length; i++){
@@ -383,15 +376,15 @@ public class ImportExcelUtil {
      * @param sheet
      * @return
      */
-    private static HSSFComment setComment(HSSFSheet sheet, ExcelModelProperty excelModelProperty){
+    private static Comment setComment(Sheet sheet, ExcelModelProperty excelModelProperty){
         String cellComment = excelModelProperty.comment();
         if(StringUtils.isNotEmpty(cellComment)){
             // 7 创建HSSFPatriarch对象,HSSFPatriarch是所有注释的容器.
-            HSSFPatriarch patr = sheet.createDrawingPatriarch();
+            Drawing patr = sheet.createDrawingPatriarch();
             // 定义注释的大小和位置,详见文档
-            HSSFComment comment = patr.createComment(new HSSFClientAnchor(255, 125, 1023, 150, (short)4, 2, (short) 6, 5));
+            Comment comment = patr.createCellComment(new XSSFClientAnchor(255, 125, 1023, 150, (short)4, 2, (short) 6, 5));
             // 设置注释内容
-            comment.setString(new HSSFRichTextString(cellComment));
+            comment.setString(new XSSFRichTextString(cellComment));
             // 设置注释作者. 当鼠标移动到单元格上是可以在状态栏中看到该内容.
             comment.setAuthor("admin");
             return comment;
@@ -405,10 +398,10 @@ public class ImportExcelUtil {
      * @param cells
      * @param wb
      */
-    private static void excelColumnStyle(HSSFSheet sheet, List<ExcelModelProperty> cells, HSSFWorkbook wb){
+    private static void excelColumnStyle(Sheet sheet, List<ExcelModelProperty> cells, Workbook wb){
         for (ExcelModelProperty index : cells) {
-            HSSFCellStyle cellStyle = wb.createCellStyle();
-            HSSFDataFormat format = wb.createDataFormat();
+            CellStyle cellStyle = wb.createCellStyle();
+            DataFormat format = wb.createDataFormat();
             DataTypeEnum dataType = index.dataType();
             switch (dataType) {
                 case DATE:
@@ -433,11 +426,11 @@ public class ImportExcelUtil {
      * 向Excel写入导出的数据
      * @param sheet
      */
-    private static void writExcelCellData(HSSFSheet sheet, List<?> datas) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    private static void writExcelCellData(Sheet sheet, List<?> datas) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
 
         for(Object obj : datas){
             // 导出数据写入Excel
-            HSSFRow dataRow = sheet.createRow(sheet.getLastRowNum() + 1);
+            Row dataRow = sheet.createRow(sheet.getLastRowNum() + 1);
             Class clazz = obj.getClass();
             Field[] fields = clazz.getDeclaredFields();
             for(Field field : fields){
@@ -528,8 +521,8 @@ public class ImportExcelUtil {
 
     }
 
-    private static String parseString(HSSFCell cell) {
-        return String.valueOf(cell).trim();
+    private static String parseString(Cell cell) {
+        return String.valueOf(cell.getStringCellValue()).trim();
     }
 
     private static long parseDate(String dateString) throws java.text.ParseException {

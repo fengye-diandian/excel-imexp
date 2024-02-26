@@ -44,7 +44,10 @@ public abstract class AbstractExcelOutput<T> {
      */
 	public BufferedInputStream outPutTemplate(Class<T> clazz, Object object) throws Throwable {
 		OutputHandlerVO<T> vo = queryTemplateComboBox(object);
-		Map<String, String[]> paramMap = vo.getSelectMap();
+		Map<String, String[]> paramMap = null;
+		if(null != vo){
+			paramMap = vo.getSelectMap();
+		}
 		BufferedInputStream input = new BufferedInputStream(ImportExcelUtil.dowloadTemplate(clazz , paramMap));
 		return input;
 	}
@@ -58,7 +61,10 @@ public abstract class AbstractExcelOutput<T> {
 		OutputHandlerVO<T> vo = queryOutputData(object);
 		List<T> datas = vo.getDataArray();
 		OutputHandlerVO<T> voBox = queryTemplateComboBox(object);
-		Map<String, String[]> paramMap = voBox.getSelectMap();
+		Map<String, String[]> paramMap = null;
+		if(null != voBox){
+			paramMap = voBox.getSelectMap();
+		}
 		BufferedInputStream input = new BufferedInputStream(ImportExcelUtil.exportDataExcel(clazz, datas, paramMap));
 		return input;
 	}
