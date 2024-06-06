@@ -96,7 +96,7 @@ public class ImportExcelUtil {
                         // 获取属性注解
                         ExcelModelProperty excelModelProperty = field.getAnnotation(ExcelModelProperty.class);
                         // 根据属性下标获取对应cell
-                        Cell cell = row.createCell(excelModelProperty.colIndex());
+                        Cell cell = row.getCell(excelModelProperty.colIndex());
                         try {
                             if (cell == null || StringUtils.isEmpty(cell.toString().trim())) {
                                 // 判断是否允许为空   false=可为空；true=不可为空
@@ -192,12 +192,13 @@ public class ImportExcelUtil {
      */
     @SuppressWarnings("resource")
 	private static InputStream excelModelbyClass(Class<?> clazz, Map<String, String[]> map, List<?> datas, boolean dowTemplate) {
+//        String sheetName = "sheet1";
         try {
             if (!clazz.isAnnotationPresent(ExcelModelTitle.class)) {
                 throw new Exception("请在此类型中加上ModelTitle注解");
             }
-            Workbook wb = new XSSFWorkbook();
-            Sheet sheet = wb.createSheet();
+            XSSFWorkbook wb = new XSSFWorkbook();
+            XSSFSheet sheet = wb.createSheet();
             // 设置标题样式
             setExcelTitle(wb, sheet, clazz);
 
@@ -241,7 +242,7 @@ public class ImportExcelUtil {
                     sheet.autoSizeColumn((short) excelModelProperty.colIndex());
                     sheet.setColumnWidth(excelModelProperty.colIndex(), excelModelProperty.name().length() * colsizeN + colsizeM);
                     // 判断列是否是下拉框
-                    setExcelSelectbox(wb, sheet, excelModelProperty,map,field, dowTemplate);
+                    setExcelSelectbox(wb, sheet, excelModelProperty, map, field, dowTemplate);
 
                 }
             }
@@ -318,56 +319,42 @@ public class ImportExcelUtil {
      * @param map
      * @param field
      */
-    private static void setExcelSelectbox(Workbook workbook, Sheet sheet, ExcelModelProperty excelModelProperty, Map<String, String[]> map, Field field, boolean dowTemplate){
+    private static void setExcelSelectbox(XSSFWorkbook workbook, XSSFSheet sheet, ExcelModelProperty excelModelProperty, Map<String, String[]> map, Field field, boolean dowTemplate){
 
-        if(dowTemplate){
-            // 设置列为下拉框格式   Map的key就是需要设定下拉框单元格的名称
+        // dowTemplate = true：导出模板设置下拉框；dowTemplate = false && exportDataShowBox = true：导出数据时也需要导出下拉框
+        if(dowTemplate || excelModelProperty.exportDataShowBox()){
             if (excelModelProperty.selectbox() && map != null && map.get(field.getName()) != null) {
                 // 下拉框数据
                 String[] box = map.get(field.getName());
-                StringBuilder arg = new StringBuilder();
-                for (String s : box) {
-                    arg.append(s);
+
+                int sheetTotal = workbook.getNumberOfSheets();
+                String hiddenSheetName = "hiddenSheet" + sheetTotal;
+                XSSFSheet hiddenSheet = workbook.createSheet(hiddenSheetName);
+
+                for (int i = 0; i < box.length; i++) {
+                    XSSFRow row = hiddenSheet.createRow(i);
+                    XSSFCell cell = row.createCell(0);
+                    cell.setCellValue(box[i]);
                 }
 
-                XSSFDataValidationHelper helper = new XSSFDataValidationHelper((XSSFSheet) sheet);
-                XSSFDataValidationConstraint constraint = (XSSFDataValidationConstraint)helper.createExplicitListConstraint(box);
+                int dropdownSize = box.length;
+                // 使用单元格A的数据进行单元格校验
+                String strFormula = new StringBuilder().append(hiddenSheetName).append("!$A$1:$A$").append(dropdownSize).toString();
+
+                XSSFDataValidationConstraint constraint = new XSSFDataValidationConstraint(DataValidationConstraint.ValidationType.LIST, strFormula);
                 //参数顺序：开始行、结束行、开始列、结束列
                 // 设定下拉框区域
                 CellRangeAddressList regions = new CellRangeAddressList(2/*从第几行开始*/, SpreadsheetVersion.EXCEL2007.getLastRowIndex()/*第几行结束*/,
                         excelModelProperty.colIndex()/*从第几列开始*/,
                         excelModelProperty.colIndex()/*到第几列结束*/);
-                XSSFDataValidation validation = (XSSFDataValidation)helper.createValidation(constraint, regions);
-                validation.setSuppressDropDownArrow(true);
-                validation.setShowErrorBox(true);
-                sheet.addValidationData(validation);
-            }
-        }
-    }
+                XSSFDataValidationHelper help = new XSSFDataValidationHelper(hiddenSheet);
+                DataValidation validation = help.createValidation(constraint, regions);
 
-    /**
-     * 将下拉框值超过255个的值放到隐藏sheet中
-     * @param workbook
-     * @param values
-     * @param field
-     */
-    private static void selectBoxHiddenValue(Workbook workbook, String[] values, Field field, String hiddenSheetName){
-        Sheet hidden = workbook.createSheet(hiddenSheetName);
-        //创建单元格对象
-        Cell cell = null;
-        for(int i=0; i < values.length; i++){
-            //根据i创建相应的行对象（说明我们将会把每个元素单独放一行）
-            Row row = hidden.createRow(i);
-            //创建每一行中的第一个单元格
-            cell = row.createCell(0);
-            //然后将数组中的元素赋值给这个单元格
-            cell.setCellValue(values[i]);
-        }
-        // 获取当前sheet下标
-        int sheetIndex = workbook.getSheetIndex(hidden);
-        if(sheetIndex > 0){
-            // 设置当前sheet隐藏
-            workbook.setSheetHidden(sheetIndex, true);
+                // 获取当前sheet下标
+                int hiddenSheetIndex = workbook.getSheetIndex(hiddenSheet);
+                sheet.addValidationData(validation);
+                workbook.setSheetHidden(hiddenSheetIndex, true);
+            }
         }
     }
 

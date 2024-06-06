@@ -63,7 +63,7 @@ public class CustomerExcelOutput extends AbstractExcelOutput<CustomerVO> {
 		Map<String,String[]> paramMap = new HashMap();
 		//excel第三行为下拉选择框
 		String[] nameArray = {"红米","小米"};
-		paramMap.put("shopName", nameArray);
+		paramMap.put("cusNameBox", nameArray);
 		vo.setSelectMap(paramMap);
 		return vo;
 	}

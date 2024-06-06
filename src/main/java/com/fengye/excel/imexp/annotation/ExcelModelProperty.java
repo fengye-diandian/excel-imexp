@@ -27,5 +27,6 @@ public @interface ExcelModelProperty {
     DataTypeEnum dataType() default DataTypeEnum.STRING;
     // 表头单元格注释
     String  comment() default  "";
-
+    // 导出数据时，是否需要设置下拉框，防止导出数据列和下拉框数据列是同一列（有时候导出模板有下拉框，导出数据的时候不需要下拉框）
+    boolean exportDataShowBox() default false;
 }

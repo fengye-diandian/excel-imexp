@@ -20,7 +20,7 @@ public class CustomerVO extends ImportModel implements Serializable {
 
 	private Long id;
 	
-	@ExcelModelProperty(name = "商铺名称", colIndex = 0, comment = "这是一个很长很长的的单元格注释", required = true, selectbox=true)
+	@ExcelModelProperty(name = "商铺名称", colIndex = 0, comment = "这是一个很长很长的的单元格注释", required = true)
 	public String shopName;// 店铺名称
 	
 	@ExcelModelProperty(name = "客户昵称", colIndex = 1)
@@ -49,6 +49,9 @@ public class CustomerVO extends ImportModel implements Serializable {
 	
 	@ExcelModelProperty(name = "消费日期", colIndex = 9, dataType = DataTypeEnum.DATE)
 	public Date customeDate; // 年月日    yyyy-MM-dd
+
+	@ExcelModelProperty(name = "客户列表下拉框", colIndex = 10, selectbox=true, exportDataShowBox = true)
+	public Date cusNameBox;
 
 
 
