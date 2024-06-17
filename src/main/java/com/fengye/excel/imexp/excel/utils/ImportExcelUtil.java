@@ -79,9 +79,17 @@ public class ImportExcelUtil {
             }
             // 缓存Excel的数据行
             List<Object> modelList = new ArrayList(sheet.getPhysicalNumberOfRows() * 2);
+            // 判断是否有Excel文件title
+            boolean bool = titleShow(clazz);;
+            // 默认从 0 行开始读，如果有文件表格标题则从2行开始读
+            int lineNumber = 1;
+            if (bool){
+                // 设置里文件表格标题
+                lineNumber = 2;
+            }
             // 从第三行开始读取数据
             sheet.getColumnBreaks();
-            for (int i = 2; i <= sheet.getLastRowNum(); i++) {
+            for (int i = lineNumber; i <= sheet.getLastRowNum(); i++) {
                 // 数据模型
                 Object model = (Object) clazz.newInstance();
                 // 获取行
@@ -200,11 +208,14 @@ public class ImportExcelUtil {
             XSSFWorkbook wb = new XSSFWorkbook();
             XSSFSheet sheet = wb.createSheet();
             // 设置标题样式
-            setExcelTitle(wb, sheet, clazz);
-
+            boolean bool = setExcelTitle(wb, sheet, clazz);
+            int rownum = 0;
+            if(bool){
+                rownum = 1;
+            }
             // 获取属性
             Field[] fields = clazz.getDeclaredFields();
-            Row headRow = sheet.createRow(1);
+            Row headRow = sheet.createRow(rownum);
             // 记录sheet有多少列
             int colSzie = 0;
 
@@ -242,16 +253,19 @@ public class ImportExcelUtil {
                     sheet.autoSizeColumn((short) excelModelProperty.colIndex());
                     sheet.setColumnWidth(excelModelProperty.colIndex(), excelModelProperty.name().length() * colsizeN + colsizeM);
                     // 判断列是否是下拉框
-                    setExcelSelectbox(wb, sheet, excelModelProperty, map, field, dowTemplate);
+                    setExcelSelectbox(wb, sheet, excelModelProperty, map, field, dowTemplate, bool);
 
                 }
             }
 
             // 设置单元格样式
             excelColumnStyle(sheet, cells, wb);
-            // 设置第一行夸 [colSzie - 1] 列
-            sheet.addMergedRegion(new CellRangeAddress(0/*从第几行开始*/, 0/*第几行结束*/,
-            		                                   0/*从第几列开始*/, colSzie - 1/*到第几列结束*/));
+            // 如果设置了文件表格title
+            if(bool){
+                // 设置第一行夸 [colSzie - 1] 列
+                sheet.addMergedRegion(new CellRangeAddress(0/*从第几行开始*/, 0/*第几行结束*/,
+                        0/*从第几列开始*/, colSzie - 1/*到第几列结束*/));
+            }
             // 加载导出的数据
             if(!dowTemplate){
                 writExcelCellData(sheet, datas);
@@ -279,20 +293,23 @@ public class ImportExcelUtil {
      * @param sheet
      * @param clazz
      */
-    private static void setExcelTitle(Workbook wb, Sheet sheet, Class<?> clazz){
-        CellStyle titleStyle = wb.createCellStyle();
-        titleStyle.setAlignment(HorizontalAlignment.CENTER_SELECTION);
-        Font font = wb.createFont();
-        font.setBold(true);
-        font.setFontHeight((short) 400);
-        titleStyle.setFont(font);
-        Cell titleCell = sheet.createRow(0).createCell(0); // 创建第一行，并在该行创建单元格，设置内容，做为标题行
-        /**
-         * 获取标题
-         */
-        ExcelModelTitle excelModelTitle = clazz.getAnnotation(ExcelModelTitle.class);
-        titleCell.setCellValue(new XSSFRichTextString(excelModelTitle.name()));
-        titleCell.setCellStyle(titleStyle);
+    private static boolean setExcelTitle(Workbook wb, Sheet sheet, Class<?> clazz){
+        // 判断是否需要设置表头
+        boolean bool = titleShow(clazz);
+        if(bool){
+            CellStyle titleStyle = wb.createCellStyle();
+            titleStyle.setAlignment(HorizontalAlignment.CENTER_SELECTION);
+            Font font = wb.createFont();
+            font.setBold(true);
+            font.setFontHeight((short) 400);
+            titleStyle.setFont(font);
+            Cell titleCell = sheet.createRow(0).createCell(0); // 创建第一行，并在该行创建单元格，设置内容，做为标题行
+            // 获取标题
+            ExcelModelTitle excelModelTitle = clazz.getAnnotation(ExcelModelTitle.class);
+            titleCell.setCellValue(new XSSFRichTextString(excelModelTitle.name()));
+            titleCell.setCellStyle(titleStyle);
+        }
+        return bool;
     }
 
     /**
@@ -319,7 +336,7 @@ public class ImportExcelUtil {
      * @param map
      * @param field
      */
-    private static void setExcelSelectbox(XSSFWorkbook workbook, XSSFSheet sheet, ExcelModelProperty excelModelProperty, Map<String, String[]> map, Field field, boolean dowTemplate){
+    private static void setExcelSelectbox(XSSFWorkbook workbook, XSSFSheet sheet, ExcelModelProperty excelModelProperty, Map<String, String[]> map, Field field, boolean dowTemplate, boolean bool){
 
         // dowTemplate = true：导出模板设置下拉框；dowTemplate = false && exportDataShowBox = true：导出数据时也需要导出下拉框
         if(dowTemplate || excelModelProperty.exportDataShowBox()){
@@ -344,9 +361,14 @@ public class ImportExcelUtil {
                 XSSFDataValidationConstraint constraint = new XSSFDataValidationConstraint(DataValidationConstraint.ValidationType.LIST, strFormula);
                 //参数顺序：开始行、结束行、开始列、结束列
                 // 设定下拉框区域
-                CellRangeAddressList regions = new CellRangeAddressList(2/*从第几行开始*/, SpreadsheetVersion.EXCEL2007.getLastRowIndex()/*第几行结束*/,
+                int startLine = 1;
+                if(bool){
+                    startLine = 2;
+                }
+                CellRangeAddressList regions = new CellRangeAddressList(startLine/*从第几行开始*/, SpreadsheetVersion.EXCEL2007.getLastRowIndex()/*第几行结束*/,
                         excelModelProperty.colIndex()/*从第几列开始*/,
                         excelModelProperty.colIndex()/*到第几列结束*/);
+
                 XSSFDataValidationHelper help = new XSSFDataValidationHelper(hiddenSheet);
                 DataValidation validation = help.createValidation(constraint, regions);
 
@@ -510,6 +532,20 @@ public class ImportExcelUtil {
 
     private static String parseString(Cell cell) {
         return String.valueOf(cell.getStringCellValue()).trim();
+    }
+
+    /**
+     * @Author zhoufeng
+     * @Description 判断Excel是否有文件title
+     * @Date 2024/6/17 10:32
+     * @Param [clazz]
+     * @return boolean
+     **/
+    private static boolean titleShow(Class<?> clazz){
+        // 获取标题
+        ExcelModelTitle excelModelTitle = clazz.getAnnotation(ExcelModelTitle.class);
+        // 判断是否需要设置表头
+        return excelModelTitle.titleShow();
     }
 
     private static long parseDate(String dateString) throws java.text.ParseException {

@@ -13,6 +13,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface ExcelModelTitle {
+    // 导出Excel表格表头名称
      public String name();
+     // 导出Excel文件名称
      public String fileName();
+     // 是否需要导出Excel表格表头
+     public boolean titleShow() default true;
  }

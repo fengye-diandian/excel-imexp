@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 @Data
-@ExcelModelTitle(name="客户消费数据", fileName="客户消费数据")
+@ExcelModelTitle(name="客户消费数据", fileName="客户消费数据", titleShow = true)
 public class CustomerVO extends ImportModel implements Serializable {
 
 	private static final long serialVersionUID = -3434719712955859295L;
