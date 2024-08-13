@@ -108,6 +108,19 @@
 			<version>1.9.4</version>
 		</dependency>
 
+<!--		csv-->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-csv</artifactId>
+			<version>1.8</version> <!-- 请检查是否有更新的版本 -->
+		</dependency>
+
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>fastjson</artifactId>
+<!--			<scope>provided</scope>-->
+			<version>1.2.76</version> <!-- 使用最新版本或适合你项目的版本 -->
+		</dependency>
 	</dependencies>
 
 	<build>
