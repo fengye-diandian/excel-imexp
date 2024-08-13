@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface ExcelModelProperty {
+public @interface ExcelModelProperty{
     // 列头名字
     String name();
     // 列坐标
